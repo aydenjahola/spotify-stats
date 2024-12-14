@@ -3,9 +3,9 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import UserInfo from "@/components/UserInfo";
-import SpotifyInfo from "@/components/SpotifyInfo";
-import SignOutButton from "@/components/SignOutButton";
+import UserInfo from "@/components/Dashboard/UserInfo";
+import SpotifyInfo from "@/components/Dashboard/SpotifyInfo";
+import SignOutButton from "@/components/Dashboard/SignOutButton";
 
 export default function Dashboard() {
   const { data: session } = useSession();

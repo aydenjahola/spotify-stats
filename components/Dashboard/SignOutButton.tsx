@@ -2,7 +2,9 @@ import { signOut as nextAuthSignOut } from "next-auth/react";
 
 export default function SignOutButton() {
   function signOut(): void {
-    nextAuthSignOut();
+    nextAuthSignOut({
+      callbackUrl: "/", // Redirect to the home page after sign out
+    });
   }
 
   return (
