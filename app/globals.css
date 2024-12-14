@@ -1,3 +1,20 @@
+/* Tailwind Configuration or Global Styles */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-300 {
+  scrollbar-color: #e2e8f0 #edf2f7;
+}
+
+.scrollbar-track-gray-100 {
+  scrollbar-color: #edf2f7 #edf2f7;
+}
+
+.scroll-smooth {
+  scroll-behavior: smooth;
+}

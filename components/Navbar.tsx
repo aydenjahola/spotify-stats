@@ -18,7 +18,7 @@ export default function Navbar() {
             href="/"
             className="text-2xl font-bold tracking-tight uppercase text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-purple-500 to-pink-600"
           >
-            MyApp
+            Spotify Stats
           </Link>
         </div>
 

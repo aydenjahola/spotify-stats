@@ -1,33 +1,39 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { getAllStats } from "./stats";
+import { getTopArtists } from "./top-artists";
+import { getTopTracks } from "./top-tracks";
+import { getTopGenres } from "./top-genres";
 
-export async function GET() {
-  const session = await getServerSession(authOptions);
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const endpoint = url.searchParams.get("endpoint");
+  const timeRange = url.searchParams.get("time_range") || "short_term";
 
-  if (!session || !session.accessToken) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  // Make the request to the Spotify API to fetch user top artists
   try {
-    const res = await fetch("https://api.spotify.com/v1/me/top/artists", {
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    });
+    let data;
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Spotify API Error:", res.status, errorText);
-      return new Response("Spotify API Error", { status: res.status });
+    switch (endpoint) {
+      case "top-artists":
+        data = await getTopArtists(timeRange);
+        break;
+      case "top-tracks":
+        data = await getTopTracks(timeRange);
+        break;
+      case "top-genres":
+        data = await getTopGenres(timeRange);
+        break;
+      case "stats":
+      default:
+        data = await getAllStats();
+        break;
     }
 
-    const data = await res.json();
     return new Response(JSON.stringify(data), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error fetching Spotify data:", error);
-    return new Response("Error fetching Spotify data", { status: 500 });
+    // Type assertion: assume error is an instance of Error
+    const e = error as Error;
+    console.error("Error fetching data:", e.message);
+    return new Response("Server Error", { status: 500 });
   }
 }
