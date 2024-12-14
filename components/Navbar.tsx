@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,6 +8,30 @@ import Image from "next/image";
 export default function Navbar() {
   const { data: session } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null); // Reference for dropdown
+  const buttonRef = useRef<HTMLButtonElement | null>(null); // Reference for the button
+
+  // Close the dropdown when clicking outside of it or on an option
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        buttonRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    };
+
+    // Add event listener for click outside
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="bg-gray-900 text-white p-4 shadow-md">
@@ -44,6 +68,7 @@ export default function Navbar() {
             <div className="relative">
               {/* Profile Picture as button */}
               <button
+                ref={buttonRef} // Attach ref to button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="rounded-full w-10 h-10 overflow-hidden border-2 border-gray-600 hover:border-teal-400 transition-all"
               >
@@ -58,20 +83,28 @@ export default function Navbar() {
 
               {/* Dropdown */}
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2">
+                <div
+                  ref={dropdownRef} // Attach ref to dropdown
+                  className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2"
+                >
                   <Link
                     href="/profile"
                     className="block px-4 py-2 text-white hover:bg-gray-700 rounded"
+                    onClick={() => setDropdownOpen(false)} // Close dropdown on option click
                   >
                     Profile
                   </Link>
                   <Link
                     href="/settings"
                     className="block px-4 py-2 text-white hover:bg-gray-700 rounded"
+                    onClick={() => setDropdownOpen(false)} // Close dropdown on option click
                   >
                     Settings
                   </Link>
-                  <button className="block w-full text-left px-4 py-2 text-white hover:bg-gray-700 rounded">
+                  <button
+                    className="block w-full text-left px-4 py-2 text-white hover:bg-gray-700 rounded"
+                    onClick={() => setDropdownOpen(false)} // Close dropdown on option click
+                  >
                     Sign Out
                   </button>
                 </div>

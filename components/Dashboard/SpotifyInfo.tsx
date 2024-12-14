@@ -18,12 +18,12 @@ export default function SpotifyInfo({ spotifyData }: SpotifyInfoProps) {
   return (
     <section className="space-y-8">
       <SpotifySection
-        title="Top Spotify Artists"
+        title="Top Spotify Artists for this month"
         items={topArtists}
         type="artist"
       />
       <SpotifySection
-        title="Top Spotify Tracks"
+        title="Top Spotify Tracks for this month"
         items={topTracks}
         type="track"
       />
