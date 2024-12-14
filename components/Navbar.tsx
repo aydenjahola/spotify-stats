@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react"; // Import signOut
 import Link from "next/link";
 import Image from "next/image";
 
@@ -103,7 +103,10 @@ export default function Navbar() {
                   </Link>
                   <button
                     className="block w-full text-left px-4 py-2 text-white hover:bg-gray-700 rounded"
-                    onClick={() => setDropdownOpen(false)} // Close dropdown on option click
+                    onClick={() => {
+                      setDropdownOpen(false); // Close dropdown when signing out
+                      signOut(); // Sign out the user
+                    }}
                   >
                     Sign Out
                   </button>
