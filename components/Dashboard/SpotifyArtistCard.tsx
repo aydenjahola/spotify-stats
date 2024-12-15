@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import Link from "next/link";
 import Image from "next/image";
 
 interface SpotifyArtistCardProps {
@@ -20,18 +21,19 @@ export default function SpotifyArtistCard({ artist }: SpotifyArtistCardProps) {
       </figure>
       <div className="card-body p-4 space-y-2 text-white">
         <h3 className="card-title text-xl font-semibold text-white truncate">
-          {artist.index + 1}. {artist.name}
+          <Link href={`/artist/${artist.id}`}>
+            {" "}
+            {/* Use dynamic URL path */}
+            {artist.index + 1}. {artist.name}
+          </Link>
         </h3>
         <p className="text-lg text-white/90">
           Followers: {artist.followers?.total.toLocaleString()}
         </p>
+        <p className="text-lg text-white/90">
+          Popularity: {artist.popularity?.toLocaleString()}
+        </p>
       </div>
-      <style jsx>{`
-        .card:hover {
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1),
-            0 0 25px 0 rgba(255, 105, 135, 0.3);
-        }
-      `}</style>
     </li>
   );
 }
