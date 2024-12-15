@@ -23,7 +23,7 @@ export default function SpotifySection({
   type = "artist",
 }: SpotifySectionProps) {
   const [scrollIndex, setScrollIndex] = useState(0);
-  const [isGridView, setIsGridView] = useState(false); // State to toggle grid view
+  const [isGridView, setIsGridView] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   const handleScrollLeft = () => {
@@ -57,9 +57,8 @@ export default function SpotifySection({
         <div className="flex items-center space-x-2">
           <button
             onClick={toggleGridView}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300"
+            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 hidden md:block lg:block xl:block"
           >
-            {/* Toggle the icon based on grid view state */}
             {isGridView ? (
               <ArrowsPointingInIcon className="w-6 h-6 text-gray-600" />
             ) : (
@@ -104,7 +103,7 @@ export default function SpotifySection({
           ) : (
             <div
               ref={scrollContainerRef}
-              className={`overflow-x-hidden flex space-x-6 mt-4 pb-8 ${
+              className={`overflow-x-hidden flex space-x-6 mt-4 pb-8 touch-scroll ${
                 type === "track" ? "scroll-smooth" : ""
               }`}
             >

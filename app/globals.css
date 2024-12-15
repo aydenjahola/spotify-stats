@@ -3,6 +3,14 @@
 @tailwind components;
 @tailwind utilities;
 
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+.touch-scroll {
+  touch-action: pan-x;
+}
+
 .animate-glowing-border {
   animation: glowing-border 1.3s ease-in-out infinite;
   border-width: 4px;
