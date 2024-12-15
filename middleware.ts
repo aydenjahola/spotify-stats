@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
   if (protectedPaths.some((path) => pathname.startsWith(path))) {
     // If there is no token (user is not logged in), redirect them to the sign-in page
     if (!token) {
-      return NextResponse.redirect(new URL("/auth/signin", req.url));
+      return NextResponse.redirect(new URL("api/auth/signin", req.url));
     }
   }
 
