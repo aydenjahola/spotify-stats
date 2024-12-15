@@ -49,6 +49,7 @@ export default function Hero() {
               <Link
                 href="https://github.com/aydenjahola/spotify-stats"
                 className="text-sm/6 font-semibold text-gray-900"
+                target="_blank"
               >
                 Learn more <span aria-hidden="true">→</span>
               </Link>
