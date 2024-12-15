@@ -85,7 +85,7 @@ export default function Navbar() {
               {dropdownOpen && (
                 <div
                   ref={dropdownRef} // Attach ref to dropdown
-                  className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2"
+                  className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-2 z-50"
                 >
                   <Link
                     href="/profile"

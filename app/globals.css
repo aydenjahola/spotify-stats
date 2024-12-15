@@ -2,3 +2,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.animate-glowing-border {
+  animation: glowing-border 1.3s ease-in-out infinite;
+  border-width: 4px;
+  border-style: solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(
+    45deg,
+    #ff6ec7,
+    #3f8dff,
+    #00c6ff,
+    #ff6ec7
+  );
+}

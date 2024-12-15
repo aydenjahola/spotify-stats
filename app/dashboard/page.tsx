@@ -8,22 +8,23 @@ import UserInfo from "@/components/Dashboard/UserInfo";
 import SpotifyInfo from "@/components/Dashboard/SpotifyInfo";
 import SignOutButton from "@/components/Dashboard/SignOutButton";
 import SpotifyError from "@/components/Dashboard/SpotifyError";
-import SpotifyGenres from "@/components/Dashboard/SpotifyGenres";
 
 export default function Dashboard() {
   const { data: session } = useSession();
   const [spotifyData, setSpotifyData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [genres, setGenres] = useState<any[]>([]);
+  const [recentTracks, setRecentTracks] = useState<any[]>([]);
+  const [timeRange, setTimeRange] = useState<string>("short_term");
 
   useEffect(() => {
     if (session) {
       fetchSpotifyData();
-      fetchTopGenres(); // Fetch the top genres as well
+      fetchTopGenres();
+      fetchRecentTracks();
     }
-  }, [session]);
+  }, [session, timeRange]);
 
-  // Fetch Top Genres
   const fetchTopGenres = async () => {
     try {
       const res = await fetch("/api/spotify-data?endpoint=top-genres");
@@ -43,9 +44,8 @@ export default function Dashboard() {
 
   const fetchSpotifyData = async () => {
     try {
-      // Fetch top artists
       const artistsRes = await fetch(
-        "/api/spotify-data?endpoint=top-artists&time_range=short_term"
+        `/api/spotify-data?endpoint=top-artists&time_range=${timeRange}`
       );
       if (!artistsRes.ok) {
         const errorText = await artistsRes.text();
@@ -55,9 +55,8 @@ export default function Dashboard() {
       }
       const artistsData = await artistsRes.json();
 
-      // Fetch top tracks
       const tracksRes = await fetch(
-        "/api/spotify-data?endpoint=top-tracks&time_range=short_term"
+        `/api/spotify-data?endpoint=top-tracks&time_range=${timeRange}`
       );
       if (!tracksRes.ok) {
         const errorText = await tracksRes.text();
@@ -67,7 +66,6 @@ export default function Dashboard() {
       }
       const tracksData = await tracksRes.json();
 
-      // Set the fetched data to the state (combine top artists and top tracks)
       setSpotifyData({
         "top-artists": artistsData.items,
         "top-tracks": tracksData.items,
@@ -78,10 +76,33 @@ export default function Dashboard() {
     }
   };
 
+  const fetchRecentTracks = async () => {
+    try {
+      const res = await fetch("/api/spotify-data?endpoint=recent-tracks");
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error fetching Recent Tracks data:", errorText);
+        setError("Failed to fetch Recent Tracks data.");
+        return;
+      }
+      const data = await res.json();
+      setRecentTracks(data.items);
+    } catch (error) {
+      console.error("Error in fetch:", error);
+      setError("An error occurred while fetching recent tracks data.");
+    }
+  };
+
+  const handleTimeRangeChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setTimeRange(event.target.value);
+  };
+
   if (!session) return <p>Loading...</p>;
 
   return (
-    <main className="p-8">
+    <main className="p-8 relative">
       {session.user && (
         <UserInfo
           user={{
@@ -91,13 +112,31 @@ export default function Dashboard() {
         />
       )}
 
-      <SpotifyGenres genres={genres} error={error} />
+      {/* Dropdown for selecting time range */}
+      <div className="absolute right-8 mb-12">
+        <select
+          id="timeRange"
+          value={timeRange}
+          onChange={handleTimeRangeChange}
+          className="px-8 py-2 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="short_term">4 weeks</option>
+          <option value="medium_term">6 months</option>
+          <option value="long_term">Lifetime</option>
+        </select>
+      </div>
 
       {error ? (
         <SpotifyError message={error} />
       ) : (
-        <SpotifyInfo spotifyData={spotifyData} />
+        <SpotifyInfo
+          spotifyData={spotifyData}
+          recentTracks={recentTracks}
+          genres={genres}
+          error={error}
+        />
       )}
+
       <SignOutButton />
     </main>
   );

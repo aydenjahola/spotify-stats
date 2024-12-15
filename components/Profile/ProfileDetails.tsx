@@ -60,7 +60,7 @@ export default function ProfileDetails() {
           </div>
         )}
 
-        <p className="text-lg text-gray-300 mt-4">
+        <p className="text-lg text-gray-300">
           <a
             href={`https://open.spotify.com/user/${id}`}
             target="_blank"

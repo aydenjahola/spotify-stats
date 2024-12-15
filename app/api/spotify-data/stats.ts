@@ -6,7 +6,7 @@ export async function getAllStats() {
   const stats = {
     topArtists: await getTopArtists("long_term"),
     topTracks: await getTopTracks("long_term"),
-    topGenres: await getTopGenres("long_term"), // Fetch top genres
+    topGenres: await getTopGenres("long_term"),
   };
   return stats;
 }
