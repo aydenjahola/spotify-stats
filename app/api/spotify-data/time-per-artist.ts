@@ -8,16 +8,21 @@ export async function getTimePerArtist(timeRange: string = "short_term") {
   const url = `https://api.spotify.com/v1/me/player/recently-played?time_range=${timeRange}&limit=50`;
   const data = await fetchSpotifyData(url, session.accessToken);
 
-  const artistTime: { [key: string]: number } = {};
+  const artistTime: { [key: string]: { id: string; time: number } } = {};
 
   data.items.forEach((item: any) => {
-    const artistName = item.track.artists[0].name;
+    const artist = item.track.artists[0];
+    const artistName = artist.name;
+    const artistId = artist.id;
     const duration = item.track.duration_ms / 60000; // Convert ms to minutes
 
     if (artistTime[artistName]) {
-      artistTime[artistName] += duration;
+      artistTime[artistName].time += duration;
     } else {
-      artistTime[artistName] = duration;
+      artistTime[artistName] = {
+        id: artistId,
+        time: duration,
+      };
     }
   });
 
