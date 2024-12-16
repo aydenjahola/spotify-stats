@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useSession } from "next-auth/react";
@@ -11,16 +10,7 @@ export default function ProfileDetails() {
   }
 
   // Extracting relevant data from session
-  const {
-    email,
-    name,
-    id,
-    followers,
-    country,
-    product,
-    playlists,
-    totalPlaylists,
-  } = session.user || {};
+  const { email, name, id, followers, country, product } = session.user || {};
 
   return (
     <section className="mt-8 p-6 bg-gray-800 rounded-lg">
@@ -37,28 +27,6 @@ export default function ProfileDetails() {
         </p>
         <p className="text-lg text-gray-300">Country: {country}</p>
         <p className="text-lg text-gray-300">Subscription: {product}</p>
-        <p className="text-lg text-gray-300">
-          Total Playlists: {totalPlaylists}
-        </p>
-
-        {playlists && playlists.length > 0 && (
-          <div className="mt-4">
-            <h4 className="text-lg text-gray-300">Public Playlists:</h4>
-            <ul className="space-y-2">
-              {playlists.map((playlist: any) => (
-                <li key={playlist.id} className="text-gray-300">
-                  <a
-                    href={playlist.external_urls.spotify}
-                    target="_blank"
-                    className="text-blue-400 hover:underline"
-                  >
-                    {playlist.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
 
         <p className="text-lg text-gray-300">
           <a

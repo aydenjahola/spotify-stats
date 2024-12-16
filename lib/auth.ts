@@ -70,6 +70,7 @@ export const authOptions = {
         token.id = profile?.id || null;
         token.followers = profile?.followers?.total || null;
         token.country = profile?.country || null;
+        token.product = profile?.product || null;
       }
 
       if (Date.now() < token.expiresAt) {
@@ -89,6 +90,7 @@ export const authOptions = {
       session.user.id = token.id;
       session.user.followers = token.followers;
       session.user.country = token.country;
+      session.user.product = token.product;
 
       return session;
     },
