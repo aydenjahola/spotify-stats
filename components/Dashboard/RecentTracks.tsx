@@ -47,13 +47,14 @@ export default function RecentTracks({
               key={uniqueKey}
               className="flex flex-col sm:flex-row items-center bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1 duration-300"
             >
-              <div className="relative w-full sm:w-32 sm:h-32 rounded-md overflow-hidden">
+              <div className="relative w-24 sm:w-32 sm:h-32 h-24 rounded-md overflow-hidden">
                 <Image
                   src={albumImageUrl}
                   alt={trackName}
-                  fill
+                  width={100}
+                  height={100}
                   className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 20vw"
+                  sizes="(max-width: 768px) 25vw, 20vw"
                 />
               </div>
 
