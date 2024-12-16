@@ -9,7 +9,7 @@ interface TopTracksSectionProps {
 export default function TopTracksSection({ topTracks }: TopTracksSectionProps) {
   return (
     <section className="space-y-8 w-full px-4 sm:px-8">
-      <span className="text-3xl sm:text-3xl font-semibold text-center sm:text-left bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
+      <span className="text-3xl sm:text-3xl font-bold text-center sm:text-left bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
         Top Tracks
       </span>
 

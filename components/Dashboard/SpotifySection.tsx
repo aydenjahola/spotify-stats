@@ -53,7 +53,7 @@ export default function SpotifySection({
   return (
     <section className="mt-12 relative">
       <div className="flex items-center justify-between">
-        <span className="text-4xl font-semibold mb-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
+        <span className="text-4xl font-bold mb-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
           {title}
         </span>
         <div className="flex items-center space-x-2">

@@ -14,9 +14,9 @@ export default function ProfileDetails() {
 
   return (
     <section className="mt-8 p-6 bg-gray-800 rounded-lg">
-      <h3 className="text-2xl font-semibold bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
+      <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">
         Profile Details
-      </h3>
+      </span>
 
       <div className="mt-4">
         <p className="text-lg text-gray-300">Email: {email}</p>
