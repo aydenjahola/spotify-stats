@@ -12,13 +12,18 @@ export default function RecentTracks({
   recentTracks,
 }: RecentTracksProps) {
   if (recentTracks.length === 0) {
-    return <p className="text-gray-500">No recent tracks available.</p>;
+    return (
+      <p className="text-gray-500 text-center">No recent tracks available.</p>
+    );
   }
 
   return (
-    <section className="mt-12">
-      <h2 className="text-4xl font-semibold mb-6">{title}</h2>
-      <ul className="space-y-6">
+    <section className="mt-12 px-4 sm:px-8 lg:px-16">
+      <span className="text-3xl sm:text-4xl font-bold text-center sm:text-left bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-transparent bg-clip-text">
+        {title}
+      </span>
+
+      <ul className="space-y-6 mt-8">
         {recentTracks.map((item: any, index: number) => {
           const track = item.track || {};
           const playedAt = new Date(item.played_at).toLocaleString() || "N/A";
@@ -40,24 +45,31 @@ export default function RecentTracks({
           return (
             <li
               key={uniqueKey}
-              className="flex flex-col bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-all"
+              className="flex flex-col sm:flex-row items-center bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:-translate-y-1 duration-300"
             >
-              <div className="flex items-center space-x-4">
+              <div className="relative w-full sm:w-32 sm:h-32 rounded-md overflow-hidden">
                 <Image
                   src={albumImageUrl}
                   alt={trackName}
-                  width={80}
-                  height={80}
-                  className="rounded-md object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 20vw"
                 />
-                <div className="text-white">
-                  <h3 className="text-xl font-semibold">
-                    {index + 1}. {trackName}
-                  </h3>
-                  <p className="text-sm">Artist: {artistName}</p>
-                  <p className="text-sm italic">Album: {albumName}</p>
-                  <p className="text-sm">Played At: {playedAt}</p>
-                </div>
+              </div>
+
+              <div className="mt-4 sm:mt-0 sm:ml-6 w-full text-white">
+                <h3 className="text-xl font-semibold line-clamp-1">
+                  {index + 1}. {trackName}
+                </h3>
+                <p className="text-sm text-gray-400 mt-1">
+                  Artist: <span className="font-medium">{artistName}</span>
+                </p>
+                <p className="text-sm text-gray-400 italic">
+                  Album: <span className="font-medium">{albumName}</span>
+                </p>
+                <p className="text-sm text-gray-400">
+                  Played At: <span className="font-medium">{playedAt}</span>
+                </p>
               </div>
             </li>
           );

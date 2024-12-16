@@ -11,84 +11,74 @@ import SpotifyError from "@/components/Dashboard/SpotifyError";
 
 export default function Dashboard() {
   const { data: session } = useSession();
+
   const [spotifyData, setSpotifyData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [genres, setGenres] = useState<any[]>([]);
   const [recentTracks, setRecentTracks] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState<string>("short_term");
 
-  // Memoized function for fetching top genres
+  const [isLoadingGenres, setIsLoadingGenres] = useState(true);
+  const [isLoadingSpotifyData, setIsLoadingSpotifyData] = useState(true);
+  const [isLoadingRecentTracks, setIsLoadingRecentTracks] = useState(true);
+
+  // function for fetching top genres
   const fetchTopGenres = useCallback(async () => {
+    setIsLoadingGenres(true);
     try {
       const res = await fetch("/api/spotify-data?endpoint=top-genres");
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Error fetching Top Genres data:", errorText);
-        setError("Failed to fetch Top Genres data.");
-        return;
-      }
+      if (!res.ok) throw new Error("Failed to fetch Top Genres data.");
       const data = await res.json();
       setGenres(data);
-    } catch (error) {
-      console.error("Error in fetch:", error);
+    } catch {
       setError("An error occurred while fetching genres data.");
+    } finally {
+      setIsLoadingGenres(false);
     }
   }, []);
 
-  // Memoized function for fetching Spotify data (top artists and top tracks)
+  // function for fetching Spotify data (top artists and top tracks)
   const fetchSpotifyData = useCallback(async () => {
+    setIsLoadingSpotifyData(true);
     try {
       const artistsRes = await fetch(
         `/api/spotify-data?endpoint=top-artists&time_range=${timeRange}`
       );
-      if (!artistsRes.ok) {
-        const errorText = await artistsRes.text();
-        console.error("Error fetching Top Artists data:", errorText);
-        setError("Failed to fetch Top Artists data.");
-        return;
-      }
+      if (!artistsRes.ok) throw new Error("Failed to fetch Top Artists data.");
       const artistsData = await artistsRes.json();
 
       const tracksRes = await fetch(
         `/api/spotify-data?endpoint=top-tracks&time_range=${timeRange}`
       );
-      if (!tracksRes.ok) {
-        const errorText = await tracksRes.text();
-        console.error("Error fetching Top Tracks data:", errorText);
-        setError("Failed to fetch Top Tracks data.");
-        return;
-      }
+      if (!tracksRes.ok) throw new Error("Failed to fetch Top Tracks data.");
       const tracksData = await tracksRes.json();
 
       setSpotifyData({
         "top-artists": artistsData.items,
         "top-tracks": tracksData.items,
       });
-    } catch (error) {
-      console.error("Error in fetch:", error);
+    } catch {
       setError("An error occurred while fetching Spotify data.");
+    } finally {
+      setIsLoadingSpotifyData(false);
     }
   }, [timeRange]);
 
-  // Memoized function for fetching recent tracks
+  // function for fetching recent tracks
   const fetchRecentTracks = useCallback(async () => {
+    setIsLoadingRecentTracks(true);
     try {
       const res = await fetch("/api/spotify-data?endpoint=recent-tracks");
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Error fetching Recent Tracks data:", errorText);
-        setError("Failed to fetch Recent Tracks data.");
-        return;
-      }
+      if (!res.ok) throw new Error("Failed to fetch Recent Tracks data.");
       const data = await res.json();
       setRecentTracks(data.items);
-    } catch (error) {
-      console.error("Error in fetch:", error);
+    } catch {
       setError("An error occurred while fetching recent tracks data.");
+    } finally {
+      setIsLoadingRecentTracks(false);
     }
   }, []);
 
-  // useEffect to fetch data when session or timeRange changes
   useEffect(() => {
     if (session) {
       fetchSpotifyData();
@@ -149,6 +139,9 @@ export default function Dashboard() {
           recentTracks={recentTracks}
           genres={genres}
           error={error}
+          isLoadingGenres={isLoadingGenres}
+          isLoadingSpotifyData={isLoadingSpotifyData}
+          isLoadingRecentTracks={isLoadingRecentTracks}
         />
       )}
 
