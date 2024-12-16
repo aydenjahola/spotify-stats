@@ -5,6 +5,7 @@ import SessionProviderWrapper from "@/components/Auth/SessionProviderWrapper";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PlausibleProvider from "next-plausible";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
         >
           <Navbar />
           {children}
+          <SpeedInsights />
           <Footer />
         </body>
       </html>
