@@ -15,8 +15,8 @@ export default function SpotifyArtistCard({ artist }: SpotifyArtistCardProps) {
           <Image
             src={artist.images[0]?.url || "/default-image.jpg"}
             alt={artist.name}
-            width={150}
-            height={150}
+            width={130}
+            height={130}
             className="rounded-full object-cover border-8 border-white shadow-xl transform transition-all hover:scale-110"
           />
         </figure>
