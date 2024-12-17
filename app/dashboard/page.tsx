@@ -3,12 +3,11 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import UserInfo from "@/components/Dashboard/UserInfo";
 import SpotifyInfo from "@/components/Dashboard/SpotifyInfo";
 import SignOutButton from "@/components/Dashboard/SignOutButton";
 import SpotifyError from "@/components/Dashboard/SpotifyError";
-import { useCallback } from "react";
 
 const fetchSpotifyData = async (
   endpoint: string,

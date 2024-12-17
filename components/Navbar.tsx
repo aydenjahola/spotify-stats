@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSession, signOut } from "next-auth/react"; // Import signOut
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -34,15 +34,17 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-gray-900 text-white p-4 shadow-md z-50">
+    <nav className="bg-gray-900 text-white shadow-md z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Logo Section */}
-        <div className="flex items-center space-x-6">
-          <Link
-            href="/"
-            className="text-2xl font-bold tracking-tight uppercase text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-purple-500 to-pink-600"
-          >
-            Spotify Stats
+        <div className="flex items-center space-x-4">
+          <Link href="/">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={100}
+              height={100}
+              className="object-contain"
+            />
           </Link>
         </div>
 
