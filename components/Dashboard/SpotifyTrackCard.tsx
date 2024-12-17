@@ -8,29 +8,31 @@ interface SpotifyTrackCardProps {
 
 export default function SpotifyTrackCard({ track }: SpotifyTrackCardProps) {
   return (
-    <li className="card card-compact w-80 bg-gradient-to-r from-green-400 to-blue-500 shadow-xl hover:shadow-2xl rounded-xl overflow-hidden transition-transform transform hover:scale-105">
-      <figure className="w-full h-48 overflow-hidden rounded-t-xl">
+    <li className="w-80 h-[400px] bg-gradient-to-r from-green-400 via-teal-500 to-blue-500 rounded-xl shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-offset-2 hover:ring-white overflow-hidden">
+      <figure className="w-full h-48 relative overflow-hidden rounded-t-xl">
         <Image
           src={track.album.images[0]?.url || "/default-image.jpg"}
           alt={track.name}
           width={200}
           height={200}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transform transition-transform hover:scale-110"
         />
       </figure>
-      <div className="card-body space-y-2 p-4 text-white">
-        <h3 className="card-title text-xl font-semibold text-white truncate">
+      <div className="px-6 py-4 space-y-3">
+        <h3 className="text-2xl font-semibold text-white truncate">
           {track.index + 1}. {track.name}
         </h3>
-        <p className="text-lg font-medium">{track.artists[0]?.name}</p>
-        <p className="text-sm text-gray-200 italic">
+        <p className="text-lg text-gray-100 font-medium">
+          {track.artists[0]?.name}
+        </p>
+        <p className="text-sm text-gray-300 italic">
           Album: {track.album.name}
         </p>
       </div>
-      <div className="card-actions justify-between p-4">
+      <div className="px-6 py-3 mt-4 flex">
         <a
           href={track.external_urls.spotify}
-          className="btn btn-sm text-white hover:bg-white hover:text-black"
+          className="bg-gradient-to-r from-indigo-600 to-pink-500 text-white text-sm font-semibold py-2 px-4 rounded-full shadow-md hover:bg-gradient-to-r hover:from-indigo-500 hover:to-pink-600 transition-colors duration-300"
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -97,7 +97,6 @@ export default function Dashboard() {
 
   return (
     <main className="relative p-8">
-      {/* Gradient and Blur Background */}
       <div className="absolute inset-0 -z-10 transform-gpu overflow-hidden blur-3xl">
         <div
           style={{
