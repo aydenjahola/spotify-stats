@@ -3,165 +3,58 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import UserInfo from "@/components/Dashboard/UserInfo";
 import SpotifyInfo from "@/components/Dashboard/SpotifyInfo";
 import SignOutButton from "@/components/Dashboard/SignOutButton";
 import SpotifyError from "@/components/Dashboard/SpotifyError";
+import { useCallback } from "react";
 
-const CACHE_EXPIRY_TIME = 1000 * 60 * 2; // 2 minutes
+const fetchSpotifyData = async (
+  endpoint: string,
+  params: Record<string, string>
+) => {
+  const query = new URLSearchParams(params).toString();
+  const res = await fetch(`/api/spotify-data?endpoint=${endpoint}&${query}`);
+  if (!res.ok) throw new Error(`Failed to fetch ${endpoint}`);
+  return res.json();
+};
 
 export default function Dashboard() {
   const { data: session } = useSession();
-
-  const [spotifyData, setSpotifyData] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [genres, setGenres] = useState<any[]>([]);
-  const [recentTracks, setRecentTracks] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState<string>("short_term");
+  const [genres, setGenres] = useState<any>(null);
+  const [spotifyData, setSpotifyData] = useState<any>(null);
+  const [recentTracks, setRecentTracks] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const [isLoadingGenres, setIsLoadingGenres] = useState(true);
-  const [isLoadingSpotifyData, setIsLoadingSpotifyData] = useState(true);
-  const [isLoadingRecentTracks, setIsLoadingRecentTracks] = useState(true);
-
-  // function for fetching top genres
-  const fetchTopGenres = useCallback(async () => {
-    setIsLoadingGenres(true);
+  const loadSpotifyData = useCallback(async () => {
     try {
-      const res = await fetch("/api/spotify-data?endpoint=top-genres");
-      if (!res.ok) throw new Error("Failed to fetch Top Genres data.");
-      const data = await res.json();
-      setGenres(data);
-      const timestamp = Date.now();
-      // Cache the data with timestamp
-      localStorage.setItem("top-genres", JSON.stringify({ data, timestamp }));
-    } catch {
-      setError("An error occurred while fetching genres data.");
-    } finally {
-      setIsLoadingGenres(false);
-    }
-  }, []);
+      const [fetchedGenres, artistsData, tracksData, fetchedRecentTracks] =
+        await Promise.all([
+          fetchSpotifyData("top-genres", {}),
+          fetchSpotifyData("top-artists", { time_range: timeRange }),
+          fetchSpotifyData("top-tracks", { time_range: timeRange }),
+          fetchSpotifyData("recent-tracks", {}),
+        ]);
 
-  // function for fetching Spotify data (top artists and top tracks)
-  const fetchSpotifyData = useCallback(async () => {
-    setIsLoadingSpotifyData(true);
-    try {
-      const artistsRes = await fetch(
-        `/api/spotify-data?endpoint=top-artists&time_range=${timeRange}`
-      );
-      if (!artistsRes.ok) throw new Error("Failed to fetch Top Artists data.");
-      const artistsData = await artistsRes.json();
-
-      const tracksRes = await fetch(
-        `/api/spotify-data?endpoint=top-tracks&time_range=${timeRange}`
-      );
-      if (!tracksRes.ok) throw new Error("Failed to fetch Top Tracks data.");
-      const tracksData = await tracksRes.json();
-
+      setGenres(fetchedGenres);
       setSpotifyData({
         "top-artists": artistsData.items,
         "top-tracks": tracksData.items,
       });
-
-      const timestamp = Date.now();
-      // Cache the data with timestamp
-      localStorage.setItem(
-        `top-artists-${timeRange}`,
-        JSON.stringify({ data: artistsData.items, timestamp })
-      );
-      localStorage.setItem(
-        `top-tracks-${timeRange}`,
-        JSON.stringify({ data: tracksData.items, timestamp })
-      );
-    } catch {
-      setError("An error occurred while fetching Spotify data.");
-    } finally {
-      setIsLoadingSpotifyData(false);
+      setRecentTracks(fetchedRecentTracks.items);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
     }
   }, [timeRange]);
 
-  // function for fetching recent tracks
-  const fetchRecentTracks = useCallback(async () => {
-    setIsLoadingRecentTracks(true);
-    try {
-      const res = await fetch("/api/spotify-data?endpoint=recent-tracks");
-      if (!res.ok) throw new Error("Failed to fetch Recent Tracks data.");
-      const data = await res.json();
-      setRecentTracks(data.items);
-      const timestamp = Date.now();
-      // Cache the data with timestamp
-      localStorage.setItem(
-        "recent-tracks",
-        JSON.stringify({ data: data.items, timestamp })
-      );
-    } catch {
-      setError("An error occurred while fetching recent tracks data.");
-    } finally {
-      setIsLoadingRecentTracks(false);
-    }
-  }, []);
-
   useEffect(() => {
     if (session) {
-      const cachedGenres = localStorage.getItem("top-genres");
-      const cachedArtists = localStorage.getItem(`top-artists-${timeRange}`);
-      const cachedTracks = localStorage.getItem(`top-tracks-${timeRange}`);
-      const cachedRecentTracks = localStorage.getItem("recent-tracks");
-
-      let dataLoaded = false; // Flag to check if data is loaded from cache or fetch
-
-      const currentTime = Date.now();
-
-      // Check if cached genres data is still valid
-      if (cachedGenres) {
-        const { data, timestamp } = JSON.parse(cachedGenres);
-        if (currentTime - timestamp < CACHE_EXPIRY_TIME) {
-          setGenres(data);
-          dataLoaded = true;
-        }
-      }
-
-      // Check if cached Spotify data is still valid
-      if (cachedArtists && cachedTracks) {
-        const { data: artistsData, timestamp: artistsTimestamp } =
-          JSON.parse(cachedArtists);
-        const { data: tracksData, timestamp: tracksTimestamp } =
-          JSON.parse(cachedTracks);
-
-        if (
-          currentTime - artistsTimestamp < CACHE_EXPIRY_TIME &&
-          currentTime - tracksTimestamp < CACHE_EXPIRY_TIME
-        ) {
-          setSpotifyData({
-            "top-artists": artistsData,
-            "top-tracks": tracksData,
-          });
-          dataLoaded = true;
-        }
-      }
-
-      // Check if cached recent tracks data is still valid
-      if (cachedRecentTracks) {
-        const { data, timestamp } = JSON.parse(cachedRecentTracks);
-        if (currentTime - timestamp < CACHE_EXPIRY_TIME) {
-          setRecentTracks(data);
-          dataLoaded = true;
-        }
-      }
-
-      // If no data was loaded from cache, fetch new data
-      if (!dataLoaded) {
-        fetchSpotifyData();
-        fetchTopGenres();
-        fetchRecentTracks();
-      } else {
-        // Reset loading states if we have valid cached data
-        setIsLoadingGenres(false);
-        setIsLoadingSpotifyData(false);
-        setIsLoadingRecentTracks(false);
-      }
+      loadSpotifyData();
     }
-  }, [session, timeRange, fetchSpotifyData, fetchTopGenres, fetchRecentTracks]);
+  }, [session, timeRange, loadSpotifyData, setGenres, setSpotifyData]);
 
   const handleTimeRangeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -192,7 +85,6 @@ export default function Dashboard() {
         />
       )}
 
-      {/* Dropdown for selecting time range */}
       <div className="absolute right-8 mb-12">
         <select
           id="timeRange"
@@ -213,10 +105,9 @@ export default function Dashboard() {
           spotifyData={spotifyData}
           recentTracks={recentTracks}
           genres={genres}
-          error={error}
-          isLoadingGenres={isLoadingGenres}
-          isLoadingSpotifyData={isLoadingSpotifyData}
-          isLoadingRecentTracks={isLoadingRecentTracks}
+          isLoadingGenres={!genres}
+          isLoadingSpotifyData={!spotifyData}
+          isLoadingRecentTracks={!recentTracks}
         />
       )}
 
