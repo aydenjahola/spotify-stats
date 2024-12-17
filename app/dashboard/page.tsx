@@ -9,6 +9,8 @@ import SpotifyInfo from "@/components/Dashboard/SpotifyInfo";
 import SignOutButton from "@/components/Dashboard/SignOutButton";
 import SpotifyError from "@/components/Dashboard/SpotifyError";
 
+const CACHE_EXPIRY_TIME = 1000 * 60 * 2; // 2 minutes
+
 export default function Dashboard() {
   const { data: session } = useSession();
 
@@ -30,8 +32,9 @@ export default function Dashboard() {
       if (!res.ok) throw new Error("Failed to fetch Top Genres data.");
       const data = await res.json();
       setGenres(data);
-      // Cache the data
-      localStorage.setItem("top-genres", JSON.stringify(data));
+      const timestamp = Date.now();
+      // Cache the data with timestamp
+      localStorage.setItem("top-genres", JSON.stringify({ data, timestamp }));
     } catch {
       setError("An error occurred while fetching genres data.");
     } finally {
@@ -60,14 +63,15 @@ export default function Dashboard() {
         "top-tracks": tracksData.items,
       });
 
-      // Cache the data
+      const timestamp = Date.now();
+      // Cache the data with timestamp
       localStorage.setItem(
         `top-artists-${timeRange}`,
-        JSON.stringify(artistsData.items)
+        JSON.stringify({ data: artistsData.items, timestamp })
       );
       localStorage.setItem(
         `top-tracks-${timeRange}`,
-        JSON.stringify(tracksData.items)
+        JSON.stringify({ data: tracksData.items, timestamp })
       );
     } catch {
       setError("An error occurred while fetching Spotify data.");
@@ -84,8 +88,12 @@ export default function Dashboard() {
       if (!res.ok) throw new Error("Failed to fetch Recent Tracks data.");
       const data = await res.json();
       setRecentTracks(data.items);
-      // Cache the data
-      localStorage.setItem("recent-tracks", JSON.stringify(data.items));
+      const timestamp = Date.now();
+      // Cache the data with timestamp
+      localStorage.setItem(
+        "recent-tracks",
+        JSON.stringify({ data: data.items, timestamp })
+      );
     } catch {
       setError("An error occurred while fetching recent tracks data.");
     } finally {
@@ -95,31 +103,62 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (session) {
-      // Check if cached data exists
       const cachedGenres = localStorage.getItem("top-genres");
       const cachedArtists = localStorage.getItem(`top-artists-${timeRange}`);
       const cachedTracks = localStorage.getItem(`top-tracks-${timeRange}`);
       const cachedRecentTracks = localStorage.getItem("recent-tracks");
 
-      if (cachedGenres) setGenres(JSON.parse(cachedGenres));
-      if (cachedArtists && cachedTracks) {
-        setSpotifyData({
-          "top-artists": JSON.parse(cachedArtists),
-          "top-tracks": JSON.parse(cachedTracks),
-        });
-      }
-      if (cachedRecentTracks) setRecentTracks(JSON.parse(cachedRecentTracks));
+      let dataLoaded = false; // Flag to check if data is loaded from cache or fetch
 
-      // Fetch new data if no cache
-      if (
-        !cachedGenres ||
-        !cachedArtists ||
-        !cachedTracks ||
-        !cachedRecentTracks
-      ) {
+      const currentTime = Date.now();
+
+      // Check if cached genres data is still valid
+      if (cachedGenres) {
+        const { data, timestamp } = JSON.parse(cachedGenres);
+        if (currentTime - timestamp < CACHE_EXPIRY_TIME) {
+          setGenres(data);
+          dataLoaded = true;
+        }
+      }
+
+      // Check if cached Spotify data is still valid
+      if (cachedArtists && cachedTracks) {
+        const { data: artistsData, timestamp: artistsTimestamp } =
+          JSON.parse(cachedArtists);
+        const { data: tracksData, timestamp: tracksTimestamp } =
+          JSON.parse(cachedTracks);
+
+        if (
+          currentTime - artistsTimestamp < CACHE_EXPIRY_TIME &&
+          currentTime - tracksTimestamp < CACHE_EXPIRY_TIME
+        ) {
+          setSpotifyData({
+            "top-artists": artistsData,
+            "top-tracks": tracksData,
+          });
+          dataLoaded = true;
+        }
+      }
+
+      // Check if cached recent tracks data is still valid
+      if (cachedRecentTracks) {
+        const { data, timestamp } = JSON.parse(cachedRecentTracks);
+        if (currentTime - timestamp < CACHE_EXPIRY_TIME) {
+          setRecentTracks(data);
+          dataLoaded = true;
+        }
+      }
+
+      // If no data was loaded from cache, fetch new data
+      if (!dataLoaded) {
         fetchSpotifyData();
         fetchTopGenres();
         fetchRecentTracks();
+      } else {
+        // Reset loading states if we have valid cached data
+        setIsLoadingGenres(false);
+        setIsLoadingSpotifyData(false);
+        setIsLoadingRecentTracks(false);
       }
     }
   }, [session, timeRange, fetchSpotifyData, fetchTopGenres, fetchRecentTracks]);
