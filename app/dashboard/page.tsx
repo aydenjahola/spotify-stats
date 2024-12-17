@@ -30,6 +30,8 @@ export default function Dashboard() {
       if (!res.ok) throw new Error("Failed to fetch Top Genres data.");
       const data = await res.json();
       setGenres(data);
+      // Cache the data
+      localStorage.setItem("top-genres", JSON.stringify(data));
     } catch {
       setError("An error occurred while fetching genres data.");
     } finally {
@@ -57,6 +59,16 @@ export default function Dashboard() {
         "top-artists": artistsData.items,
         "top-tracks": tracksData.items,
       });
+
+      // Cache the data
+      localStorage.setItem(
+        `top-artists-${timeRange}`,
+        JSON.stringify(artistsData.items)
+      );
+      localStorage.setItem(
+        `top-tracks-${timeRange}`,
+        JSON.stringify(tracksData.items)
+      );
     } catch {
       setError("An error occurred while fetching Spotify data.");
     } finally {
@@ -72,6 +84,8 @@ export default function Dashboard() {
       if (!res.ok) throw new Error("Failed to fetch Recent Tracks data.");
       const data = await res.json();
       setRecentTracks(data.items);
+      // Cache the data
+      localStorage.setItem("recent-tracks", JSON.stringify(data.items));
     } catch {
       setError("An error occurred while fetching recent tracks data.");
     } finally {
@@ -81,9 +95,32 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (session) {
-      fetchSpotifyData();
-      fetchTopGenres();
-      fetchRecentTracks();
+      // Check if cached data exists
+      const cachedGenres = localStorage.getItem("top-genres");
+      const cachedArtists = localStorage.getItem(`top-artists-${timeRange}`);
+      const cachedTracks = localStorage.getItem(`top-tracks-${timeRange}`);
+      const cachedRecentTracks = localStorage.getItem("recent-tracks");
+
+      if (cachedGenres) setGenres(JSON.parse(cachedGenres));
+      if (cachedArtists && cachedTracks) {
+        setSpotifyData({
+          "top-artists": JSON.parse(cachedArtists),
+          "top-tracks": JSON.parse(cachedTracks),
+        });
+      }
+      if (cachedRecentTracks) setRecentTracks(JSON.parse(cachedRecentTracks));
+
+      // Fetch new data if no cache
+      if (
+        !cachedGenres ||
+        !cachedArtists ||
+        !cachedTracks ||
+        !cachedRecentTracks
+      ) {
+        fetchSpotifyData();
+        fetchTopGenres();
+        fetchRecentTracks();
+      }
     }
   }, [session, timeRange, fetchSpotifyData, fetchTopGenres, fetchRecentTracks]);
 
