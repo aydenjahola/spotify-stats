@@ -14,6 +14,7 @@ export default function ArtistPage() {
   const [artistData, setArtistData] = useState<any>(null);
   const [albums, setAlbums] = useState<any[]>([]);
   const [topTracks, setTopTracks] = useState<any[]>([]);
+  const [followsArtist, setFollowsArtist] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,8 +22,7 @@ export default function ArtistPage() {
 
     async function fetchData(
       endpoint: string,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-      setter: Function,
+      setter: (data: any) => void,
       errorMsg: string
     ) {
       try {
@@ -38,6 +38,20 @@ export default function ArtistPage() {
       }
     }
 
+    async function fetchFollowStatus() {
+      try {
+        const res = await fetch(
+          `/api/spotify-data?endpoint=check-following&artistIds=${artistId}`
+        );
+        if (!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        setFollowsArtist(data[0]); // Spotify API returns an array of booleans
+      } catch (err) {
+        console.error("Error fetching follow status:", err);
+        setError("Failed to fetch follow status.");
+      }
+    }
+
     fetchData("artist", setArtistData, "Failed to fetch artist data.");
     fetchData("artist-albums", setAlbums, "Failed to fetch artist's albums.");
     fetchData(
@@ -45,6 +59,7 @@ export default function ArtistPage() {
       setTopTracks,
       "Failed to fetch artist's top tracks."
     );
+    fetchFollowStatus();
   }, [artistId]);
 
   if (error) return <ErrorMessage message={error} />;
@@ -52,7 +67,7 @@ export default function ArtistPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white p-12 flex flex-col items-center justify-center space-y-12">
-      <ArtistHeader artistData={artistData} />
+      <ArtistHeader artistData={artistData} followsArtist={followsArtist} />
       <AlbumsSection albums={albums} />
       <TopTracksSection topTracks={topTracks} />
     </main>

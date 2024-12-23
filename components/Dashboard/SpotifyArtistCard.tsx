@@ -9,7 +9,7 @@ interface SpotifyArtistCardProps {
 
 export default function SpotifyArtistCard({ artist }: SpotifyArtistCardProps) {
   return (
-    <li className="card card-compact w-80 h-96 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 rounded-3xl shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-white hover:ring-opacity-40">
+    <li className="card card-compact w-80 h-96 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-600 rounded-3xl shadow-xl transform transition-all hover:shadow-2xl hover:ring-2 hover:ring-white hover:ring-opacity-40">
       <Link href={`/artist/${artist.id}`}>
         <figure className="w-40 h-40 mx-auto mt-6 mb-4 relative">
           <Image
@@ -25,9 +25,7 @@ export default function SpotifyArtistCard({ artist }: SpotifyArtistCardProps) {
             {artist.index + 1}. {artist.name}
           </h3>
           <div className="flex items-center space-x-4 text-lg text-white/90">
-            <span className="badge badge-primary badge-outline">
-              Followers:
-            </span>
+            <span className="badge badge-accent badge-outline">Followers:</span>
             <span className="font-semibold">
               {artist.followers?.total.toLocaleString()}
             </span>

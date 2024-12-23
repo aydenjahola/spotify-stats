@@ -4,9 +4,13 @@ import Image from "next/image";
 
 interface ArtistHeaderProps {
   artistData: any;
+  followsArtist: boolean | null;
 }
 
-export default function ArtistHeader({ artistData }: ArtistHeaderProps) {
+export default function ArtistHeader({
+  artistData,
+  followsArtist,
+}: ArtistHeaderProps) {
   return (
     <div className="max-w-5xl w-full text-center">
       <h1 className="text-5xl font-bold mb-4">
@@ -42,6 +46,16 @@ export default function ArtistHeader({ artistData }: ArtistHeaderProps) {
           Popularity:{" "}
           <span className="font-semibold text-indigo-400">
             {artistData.popularity}
+          </span>
+        </p>
+        <p className="text-xl font-light opacity-75">
+          Following:{" "}
+          <span className="font-semibold text-indigo-400">
+            {followsArtist === null
+              ? "Loading..."
+              : followsArtist
+              ? "Yes"
+              : "No"}
           </span>
         </p>
         <button className="px-6 py-3 text-white font-semibold rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 hover:from-purple-600 hover:via-pink-600 hover:to-red-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">

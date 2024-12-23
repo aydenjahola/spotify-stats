@@ -8,7 +8,7 @@ interface SpotifyTrackCardProps {
 
 export default function SpotifyTrackCard({ track }: SpotifyTrackCardProps) {
   return (
-    <li className="w-80 h-[400px] bg-gradient-to-r from-green-400 via-teal-500 to-blue-500 rounded-xl shadow-xl transform transition-all hover:scale-105 hover:shadow-2xl hover:ring-2 hover:ring-offset-2 hover:ring-white overflow-hidden">
+    <li className="w-80 h-[400px] bg-gradient-to-r from-green-400 via-teal-500 to-blue-500 rounded-xl shadow-xl transform transition-all hover:shadow-2xl hover:ring-2 hover:ring-offset-2 hover:ring-white overflow-hidden">
       <figure className="w-full h-48 relative overflow-hidden rounded-t-xl">
         <Image
           src={track.album.images[0]?.url || "/default-image.jpg"}

@@ -11,6 +11,7 @@ import { getRecentTracks } from "./recent-tracks";
 import { getTotalListeningTime } from "./total-listening-time";
 import { getTimePerArtist } from "./time-per-artist";
 import { getTotalStreams } from "./total-streams";
+import { CheckIfUserFollowsArtists } from "./CheckIfUserFollowsArtists";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -82,6 +83,11 @@ export async function GET(request: Request) {
 
       case "total-streams":
         data = await getTotalStreams();
+        break;
+
+      case "check-following":
+        const artistIds = url.searchParams.getAll("artistIds");
+        data = await CheckIfUserFollowsArtists(artistIds);
         break;
 
       case "stats":
