@@ -74,24 +74,26 @@ export default function AlbumInfo({ albumData }: AlbumInfoProps) {
   }
 
   return (
-    <section className="album-info flex items-center space-x-6 bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-lg shadow-2xl">
-      <Image
-        src={albumData.imageUrl}
-        alt={albumData.name}
-        width={96}
-        height={96}
-        className="object-cover rounded-lg shadow-lg"
-      />
+    <section className="album-info flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-6 bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-lg shadow-2xl">
+      <div className="flex-shrink-0">
+        <Image
+          src={albumData.imageUrl}
+          alt={albumData.name}
+          width={96}
+          height={96}
+          className="object-cover rounded-lg shadow-lg"
+        />
+      </div>
 
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-red-500">
+      <div className="text-center md:text-left space-y-4">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-red-500">
           {albumData.name}
         </h1>
         <p className="text-gray-400 text-sm">
           {albumData.release_date} &bull; {albumData.total_tracks} tracks
         </p>
 
-        <div className="flex justify-center space-x-6 mt-4">
+        <div className="flex flex-col md:flex-row justify-center md:justify-start space-y-4 md:space-y-0 md:space-x-6 mt-4">
           <Button
             onClick={saveAlbum}
             isLoading={isSaving}
