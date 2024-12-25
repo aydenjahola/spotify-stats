@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { getSession } from "./auth";
 import { getArtistData } from "./search";
 import { getArtistAlbums } from "./artist-albums";
@@ -12,6 +14,10 @@ import { getTotalListeningTime } from "./total-listening-time";
 import { getTimePerArtist } from "./time-per-artist";
 import { getTotalStreams } from "./total-streams";
 import { CheckIfUserFollowsArtists } from "./CheckIfUserFollowsArtists";
+import { getAlbum } from "./get-album";
+import { getAlbumTracks } from "./get-album-tracks";
+import { saveAlbum } from "./save-album";
+import { removeAlbum } from "./delete-album";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -24,6 +30,8 @@ export async function GET(request: Request) {
     const session = await getSession();
 
     let data;
+
+    const albumId = url.searchParams.get("albumId");
 
     // Switch for different endpoints
     switch (endpoint) {
@@ -90,6 +98,52 @@ export async function GET(request: Request) {
         data = await CheckIfUserFollowsArtists(artistIds);
         break;
 
+      case "get-album-with-tracks":
+        if (!albumId) {
+          return new Response(
+            JSON.stringify({ error: "Missing 'albumId' parameter" }),
+            { status: 400 }
+          );
+        }
+
+        const albumData = await getAlbum(albumId, session.accessToken);
+
+        const albumTracks = await getAlbumTracks(albumId, session.accessToken);
+
+        const tracksWithImages = albumTracks.items.map((track: any) => ({
+          ...track,
+          imageUrl: albumData.images?.[0]?.url || "",
+        }));
+
+        data = {
+          name: albumData.name || "Unknown Album",
+          release_date: albumData.release_date || "Unknown Date",
+          total_tracks: albumData.total_tracks || 0,
+          imageUrl: albumData.images?.[0]?.url || "",
+          tracks: tracksWithImages,
+        };
+        break;
+
+      case "save-album":
+        if (!albumId) {
+          return new Response(
+            JSON.stringify({ error: "Missing 'albumId' parameter" }),
+            { status: 400 }
+          );
+        }
+        data = await saveAlbum(albumId);
+        break;
+
+      case "remove-album":
+        if (!albumId) {
+          return new Response(
+            JSON.stringify({ error: "Missing 'albumId' parameter" }),
+            { status: 400 }
+          );
+        }
+        data = await removeAlbum(albumId);
+        break;
+
       case "stats":
       default:
         data = await getAllStats();
@@ -110,4 +164,64 @@ export async function GET(request: Request) {
     console.error("Error fetching data:", e.message);
     return new Response("Server Error", { status: 500 });
   }
+}
+
+export async function POST(request: Request) {
+  const url = new URL(request.url);
+  const endpoint = url.searchParams.get("endpoint");
+  const albumId = url.searchParams.get("albumId");
+
+  if (endpoint === "save-album") {
+    try {
+      const session = await getSession();
+      if (!session?.accessToken) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized, no access token found" }),
+          { status: 401 }
+        );
+      }
+
+      const { success, message } = await saveAlbum(albumId as string);
+      return new Response(JSON.stringify({ success, message }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      const e = error as Error;
+      console.error("Error saving album:", e.message);
+      return new Response(
+        JSON.stringify({ error: "Failed to save the album" }),
+        { status: 500 }
+      );
+    }
+  }
+
+  if (endpoint === "remove-album") {
+    try {
+      const session = await getSession();
+      if (!session?.accessToken) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized, no access token found" }),
+          { status: 401 }
+        );
+      }
+
+      const { success, message } = await removeAlbum(albumId as string);
+      return new Response(JSON.stringify({ success, message }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      const e = error as Error;
+      console.error("Error removing album:", e.message);
+      return new Response(
+        JSON.stringify({ error: "Failed to remove the album" }),
+        { status: 500 }
+      );
+    }
+  }
+
+  // Default case for unsupported POST endpoints
+  return new Response(
+    JSON.stringify({ error: "Invalid or unsupported endpoint" }),
+    { status: 400 }
+  );
 }
